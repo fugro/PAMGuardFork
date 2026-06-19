@@ -1,0 +1,23 @@
+# Build the PAMGuard fat jar and publish it as a GitHub Release asset.
+# Triggers on pushing a `fugro-v*` tag (e.g. fugro-v2.02.18-1).
+name: release-jar
+
+on:
+  push:
+    tags: ['fugro-v*']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write          # needed to create the release
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - run: mvn -B clean install shade:shade -DskipTests
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: target/Pamguard-*.jar     # attaches the fat jar as a release asset
