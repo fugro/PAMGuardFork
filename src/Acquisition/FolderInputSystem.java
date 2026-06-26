@@ -184,6 +184,9 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 				currentFileIndex++;
 			}
 		}
+		if (ans) {
+			sayFileProgress();
+		}
 		if (!ans && ++currentFileIndex < allFiles.size()) {
 			System.out.println("Failed to open sound file. Try again with file " + allFiles.get(currentFileIndex).getName());
 			/*
@@ -928,6 +931,7 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 				return false;
 			}
 			currentFileStart = System.currentTimeMillis();
+			sayFileProgress();
 			//			if (ans && audioFormat.getSampleRate() != currentSampleRate && currentFile > 0) {
 			//				acquisitionControl.getDaqProcess().setSampleRate(currentSampleRate = audioFormat.getSampleRate(), true);
 			//			}
@@ -967,6 +971,19 @@ public class FolderInputSystem extends FileInputSystem implements PamSettings, D
 	private void setFolderProgress() {
 		folderProgress.setValue(currentFileIndex);
 		folderProgress.setString(String.format("%d/%d", currentFileIndex, folderProgress.getMaximum()));
+	}
+
+	/**
+	 * Print a simple progress line to the console / log showing which file of the
+	 * total is currently being processed. Useful in headless (-nogui) runs where
+	 * the folderProgress bar is not visible.
+	 */
+	private void sayFileProgress() {
+		WavFileType currentFile = getCurrentFile();
+		if (currentFile != null && allFiles != null) {
+			System.out.println(String.format("Processing file %d/%d: %s",
+					currentFileIndex + 1, allFiles.size(), currentFile.getName()));
+		}
 	}
 
 	protected void calculateETA() {
